@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--    spring整合shiro-->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <!--        引用自定义的realm-->
+        <property name="realm" ref="authRealm"/>
+    </bean>
+
+    <!--    自定义Realm域的编写-->
+    <bean id="authRealm" class="cn.itcast.web.shiro.AuthRealm">
+        <!-- 注入自定义的密码比较器 -->
+        <property name="credentialsMatcher" ref="customerCredentialsMatcher"/>
+    </bean>
+
+    <!-- 自定义的密码比较器 -->
+    <bean id="customerCredentialsMatcher" class="cn.itcast.web.shiro.CustomCredentialsMatcher"/>
+
+    <!-- filter-name这个名字的值来自于web.xml中filter的名字 -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <!--登录页面  -->
+        <property name="loginUrl" value="/login.jsp"/>
+        <!-- 登录失败后 -->
+        <property name="unauthorizedUrl" value="/unauthorized.jsp"/>
+
+        <property name="filterChainDefinitions">
+            <!-- /**代表下面的多级目录也过滤 -->
+            <value>
+                /system/module/list.do = perms["模块管理"]
+                /company/list.do = perms["企业管理"]
+                /system/log/list.do =perms["日志管理"]
+                /cargo = perms["货运管理"]
+                /cargo/contract/list.do = perms["购销合同"]
+                /cargo/contract/print.do = perms["出货表"]
+                /cargo/export/contractList.do = perms["合同管理"]
+                /cargo/export/list.do = perms["出口报运"]
+                /cargo/packing/list.do = perms["装箱管理"]
+                /cargo/shipping/list.do = perms["委托管理"]
+                /cargo/invoice/list.do = perms["发票管理"]
+                /cargo/finance/list.do = perms["财务管理"]
+                /stat = perms["统计分析"]
+                /stat/toCharts.do = perms["生产厂家销售情况"]
+                /stat/toCharts.do = perms["产品销售排行"]
+                /stat/toCharts.do = perms["系统访问压力图"]
+                /baseinfo = perms["基础信息"]
+                /sysadmin = perms["系统管理"]
+                /system/user/list.do = perms["用户管理"]
+                /system/role/list.do = perms["角色管理"]
+                /system/module/list.do = perms["模块管理"]
+
+                <!--anon匿名登录
+                        userLogin.jsp
+                        /userLogin.jsp* = anon
+
+                -->
+                /index.jsp* = anon
+                /login.jsp* = anon
+                /login* = anon
+                /logout* = anon
+                /css/** = anon
+                /img/** = anon
+                /plugins/** = anon
+                /make/** = anon
+                <!--authc必须要登录
+
+                /company/list.do
+                /company.do
+                -->
+                /** = authc
+                /*.* = authc
+            </value>
+        </property>
+    </bean>
+</beans>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.dao.stat.StatDao">
+<!--    厂家销售数据-->
+    <select id="getFactoryData" resultType="map" parameterType="string">
+        SELECT factory_name AS name,SUM(amount) AS value
+        FROM co_contract_product
+        WHERE company_id = #{companyId}
+        GROUP BY factory_name
+    </select>
+<!--    商品销售情况-->
+    <select id="getSellData" parameterType="string" resultType="map">
+    SELECT product_no AS name,SUM(amount) AS value
+    FROM co_contract_product
+    WHERE company_id = #{companyId}
+    GROUP BY product_no
+    ORDER BY SUM(amount)
+    LIMIT 15
+    </select>
+
+<!--    在线人数-->
+    <select id="getOnlineData" resultType="map" parameterType="string">
+        SELECT st_online_info.A1 as name, IFNULL(st_sys_log1.value, 0) AS value
+        FROM st_online_info LEFT JOIN
+        (SELECT DATE_FORMAT(TIME, "%H") AS NAME, COUNT(*) AS VALUE
+        FROM st_sys_log
+        WHERE company_id = #{companyId}
+        GROUP BY DATE_FORMAT(TIME, "%H")) st_sys_log1
+        ON st_online_info.A1 = st_sys_log1.name
+    </select>
+
+    <select id="getMarketData" parameterType="string" resultType="map">
+        SELECT product_no AS name, price AS value
+        FROM co_export_product
+        WHERE company_id = #{companyId}
+        ORDER BY price
+        LIMIT 10
+    </select>
+
+    <select id="getVisitData" parameterType="string" resultType="map">
+        SELECT user_name AS name, COUNT(ip) AS value
+        FROM st_sys_log
+        WHERE company_id = #{companyId}
+        GROUP BY user_name
+        ORDER BY COUNT(ip) DESC
+        LIMIT 10
+    </select>
+</mapper>

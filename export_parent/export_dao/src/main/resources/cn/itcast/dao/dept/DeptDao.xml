@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.dao.dept.DeptDao">
+    <resultMap id="DeptBaseMap" type="cn.itcast.domain.dept.Dept">
+        <id column="dept_id" property="id"></id>
+        <result column="dept_name" property="deptName"></result>
+<!--        <result column="parent_id" property="parentId"></result>-->
+        <result column="state" property="state"></result>
+        <result column="company_id" property="companyId"></result>
+        <result column="company_name" property="companyName"></result>
+
+<!--        進行一對一映射-->
+        <association property="parent" javaType="cn.itcast.domain.dept.Dept"
+                     column="parent_id" select="findById"></association>
+
+    </resultMap>
+    <select id="findAll" resultMap="DeptBaseMap">
+        select * from pe_dept where company_id = #{companyId}
+    </select>
+
+    <select id="findById" resultMap="DeptBaseMap">
+        select * from pe_dept where dept_id = #{id};
+    </select>
+
+<!--    添加部门-->
+    <insert id="save" parameterType="dept">
+        insert into pe_dept values (
+        #{id},#{deptName},#{parent.id},#{state},#{companyId},#{companyName}
+        )
+    </insert>
+
+<!--    删除该部门和其子部门-->
+    <delete id="delete" >
+        delete from pe_dept where dept_id=#{id}
+    </delete>
+
+<!--    修改部门的信息-->
+    <update id="update" parameterType="cn.itcast.domain.dept.Dept">
+        update pe_dept
+        <set>
+        dept_name=#{deptName},parent_id=#{parent.id},state=#{state}
+        </set>
+         where dept_id=#{id}
+    </update>
+</mapper>
