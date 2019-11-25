@@ -3,3 +3,6 @@
 .idea
 *.class
 target
+.settings
+.project
+.classpath	
